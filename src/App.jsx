@@ -1,70 +1,86 @@
 import axios from "axios";
 import { useState, useEffect } from "react";
 
-function app() {
-  const API_KEY = import.meta.env.VITE_API_KEY; //mengambil API key dari file .env
-  const [city, setCity] = useState(""); //menyimpan nama kota
-  const [data, setData] = useState([]); //menyimpan data dari API
+function App() {
+  const API_KEY = import.meta.env.VITE_API_KEY;
+  const [city, setCity] = useState("");
+  const [data, setData] = useState({});
 
-  const fectweather = async () => {
+  const fetchWeather = async () => {
+    if (!city) return; // kalau input kosong, jangan fetch
     try {
       const res = await axios.get(
-        `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}&units=metric` //memanggil API weather dengan axios
-      ); //memanggil API weather dengan axios
-      console.log(res.data); //menampilkan data di console
-      setData(res.data); //menyimpan data dari API ke state data
+        `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}&units=metric`
+      );
+      setData(res.data);
     } catch (error) {
       console.error(error);
-    } //menampilkan error di console
+    }
   };
 
   useEffect(() => {
-    fectweather();
-  }, [city]); //memanggil fungsi fectweather saat komponen pertama kali di render
+    fetchWeather();
+  }, [city]);
 
   return (
-    <>
-      <div className="w-[800px] h-[400px] bg-blue-300 m-auto mt-20 rounded-xl text-center flex flex-col justify-center gap-4 border-none">
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-400 to-indigo-600 p-5">
+      <div className="w-[850px] bg-white/20 backdrop-blur-md rounded-2xl shadow-2xl p-6 flex flex-col gap-6 text-white">
+        {/* Input */}
         <input
           type="text"
-          placeholder="Masukkan kota"
+          placeholder="Masukkan kota..."
           value={city}
           onChange={(e) => setCity(e.target.value)}
-          className="p-2 rounded-lg text-center"
+          className="p-3 rounded-xl text-center text-black shadow-md focus:outline-none focus:ring-2 focus:ring-yellow-400"
         />
-        <div className="flex gap[20px] items-center">
-          <div className="flex flex-col gap-3 m-3 w-[400px] items-center justify-center">
-            {/* Ikon cuaca dari API */}
-            {data.weather && (
+
+        {/* Konten cuaca */}
+        {data.weather ? (
+          <div className="flex flex-col md:flex-row gap-6 items-center justify-between">
+            {/* Bagian kiri */}
+            <div className="flex flex-col items-center gap-4 w-full md:w-1/2">
               <img
-                src={`http://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`}
+                src={`http://openweathermap.org/img/wn/${data.weather[0].icon}@4x.png`}
                 alt={data.weather[0].description}
-                className="w-[200px]"
+                className="w-[180px]"
               />
-            )}
-            <div className="flex gap-5 items-center">
-              <h1>
+              <h1 className="text-3xl font-bold">
                 {data?.name}, {data.sys?.country}
               </h1>
-              <p className="border-x-2 border-black p-3">{data.main?.temp}°C</p>
-              <p>{data.weather?.[0].main}</p>
+              <p className="text-lg text-gray-100">
+                {data.weather?.[0].description}
+              </p>
+              <p className="text-4xl font-extrabold">
+                {Math.round(data.main?.temp)}°C
+              </p>
+            </div>
+
+            {/* Bagian kanan */}
+            <div className="grid grid-cols-1 gap-4 w-full md:w-1/2">
+              <div className="flex flex-col items-center justify-center bg-white/30 rounded-2xl p-4 shadow-md">
+                <p className="text-xl">🌡️ Feels like</p>
+                <p className="text-2xl font-semibold">
+                  {Math.round(data.main?.feels_like)}°C
+                </p>
+              </div>
+              <div className="flex flex-col items-center justify-center bg-white/30 rounded-2xl p-4 shadow-md">
+                <p className="text-xl">💧 Humidity</p>
+                <p className="text-2xl font-semibold">{data.main?.humidity}%</p>
+              </div>
+              <div className="flex flex-col items-center justify-center bg-white/30 rounded-2xl p-4 shadow-md">
+                <p className="text-xl">💨 Wind</p>
+                <p className="text-2xl font-semibold">{data.wind?.speed} m/s</p>
+              </div>
             </div>
           </div>
-          <div className="flex flex-col gap-3 m-3 w-[400px] items-center justify-center">
-            <p className="flex w-[200px] h-[80px] bg-blue-600 items-center justify-center rounded-2xl">
-              Feels like: {data.main?.feels_like}°C
-            </p>
-            <p className="flex w-[200px] h-[80px] bg-blue-600 items-center justify-center rounded-2xl">
-              Humididty: {data.main?.humidity}%
-            </p>
-            <p className="flex w-[200px] h-[80px] bg-blue-600 items-center justify-center rounded-2xl">
-              Wind: {data.wind?.speed}m/s
-            </p>
-          </div>
-        </div>
+        ) : (
+          <p className="text-center text-xl">
+            Masukkan nama kota untuk cek cuaca 🌍
+          </p>
+        )}
       </div>
-    </>
+    </div>
   );
 }
 
-export default app;
+export default App;
