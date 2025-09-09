@@ -24,7 +24,7 @@ function app() {
 
   return (
     <>
-      <div className="w-[800px] h-[400px] bg-blue-300 m-auto mt-20 rounded-xl text-center flex flex-col justify-center gap-4">
+      <div className="w-[800px] h-[400px] bg-blue-300 m-auto mt-20 rounded-xl text-center flex flex-col justify-center gap-4 border-none">
         <input
           type="text"
           placeholder="Masukkan kota"
